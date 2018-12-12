@@ -12,14 +12,18 @@ CAPTURE = False
 RECOGNITION = False
 CAP_NUM = 0
 print(sys.argv)
-if sys.argv[1] == "capture":
-    print("Emily: capture mode")
-    CAPTURE = True
-    CAP_NUM = int(sys.argv[2])
-    FOLDER = sys.argv[3]
-    PATH_TO_SAVE = "./training_data/" + FOLDER
-elif sys.argv[1] == "recognition":
-        RECOGNITION = True
+print(len(sys.argv))
+if len(sys.argv)==1:
+    recognition = True
+else:
+    if sys.argv[1] == "capture":
+        print("Emily: capture mode")
+        CAPTURE = True
+        CAP_NUM = int(sys.argv[2])
+        FOLDER = sys.argv[3]
+        PATH_TO_SAVE = "./training_data/" + FOLDER
+    elif sys.argv[1] == "recognition":
+        recognition = True
         
 
         
@@ -34,10 +38,13 @@ def draw_bounding_box():
         x,y,w,h = rect
         cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
 
+
 def network(x, test=False):
     # Input:x -> 3,64,64
+    # ImageAugmentation
+    h = F.image_augmentation(x, (3,64,64), (0,0), 1, 1, 0, 1, 0, True, False, 0, False, 1, 0.5, False, 0)
     # Convolution -> 16,60,60
-    h = PF.convolution(x, 16, (5,5), (0,0), name='Convolution')
+    h = PF.convolution(h, 16, (5,5), (0,0), name='Convolution')
     # ReLU
     h = F.relu(h, True)
     # MaxPooling -> 16,30,30
@@ -84,10 +91,10 @@ def classification(img_in):
     print("result array ", result_array)
     max_index = index[0]
     print("result_array.argmax = ", result_array.argmax())
-    if max_index == 0:
+    if max_index == 0 and result_array[0] >= 0.7:
         result_class = "Hello Carlos"
         print(result_class)
-    elif max_index == 1:
+    elif max_index == 1 and result_array[max_index]>=0.7:
         result_class = "Hello Emily"
         print(result_class)
     else: 
