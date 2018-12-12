@@ -13,17 +13,14 @@ RECOGNITION = False
 CAP_NUM = 0
 print(sys.argv)
 print(len(sys.argv))
-if len(sys.argv)==1:
+if sys.argv[1] == "capture":
+    print("Emily: capture mode")
+    CAPTURE = True
+    CAP_NUM = int(sys.argv[2])
+    FOLDER = sys.argv[3]
+    PATH_TO_SAVE = "./training_data/" + FOLDER
+elif sys.argv[1] == "recognition":
     recognition = True
-else:
-    if sys.argv[1] == "capture":
-        print("Emily: capture mode")
-        CAPTURE = True
-        CAP_NUM = int(sys.argv[2])
-        FOLDER = sys.argv[3]
-        PATH_TO_SAVE = "./training_data/" + FOLDER
-    elif sys.argv[1] == "recognition":
-        recognition = True
         
 
         
