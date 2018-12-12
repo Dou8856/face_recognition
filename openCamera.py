@@ -34,10 +34,13 @@ def draw_bounding_box():
         x,y,w,h = rect
         cv2.rectangle(im,(x,y),(x+w,y+h),(0,255,0),2)
 
+
 def network(x, test=False):
     # Input:x -> 3,64,64
+    # ImageAugmentation
+    h = F.image_augmentation(x, (3,64,64), (0,0), 1, 1, 0, 1, 0, False, False, 0, False, 1, 0.5, False, 0)
     # Convolution -> 16,60,60
-    h = PF.convolution(x, 16, (5,5), (0,0), name='Convolution')
+    h = PF.convolution(h, 16, (5,5), (0,0), name='Convolution')
     # ReLU
     h = F.relu(h, True)
     # MaxPooling -> 16,30,30
@@ -83,16 +86,17 @@ def classification(img_in):
     index = np.unravel_index(result_array.argmax(), result_array.shape)
     print("result array ", result_array)
     max_index = index[0]
+    prob = result_array[max_index]
     print("result_array.argmax = ", result_array.argmax())
-    if max_index == 0:
+    if max_index == 0 and prob>0.9:
         result_class = "Hello Carlos"
         print(result_class)
-    elif max_index == 1:
+    elif max_index == 1 and prob>0.9: 
         result_class = "Hello Emily"
         print(result_class)
     else: 
         result_class = "can't identify"
-    return result_class
+    return result_class, str(prob)
 
 
 cap = cv2.VideoCapture(0)
@@ -131,7 +135,7 @@ while(True):
 
         date_time =  datetime.datetime.now()
         datetime_str = date_time.strftime('%d %H:%M:%S')
-        text_to_display = datetime_str + "\n" + result
+        text_to_display = datetime_str + "\n " + result[0] + "\n probability: " + result[1]
         cv2.putText(frame, text_to_display, (x_axis,y_axis), font, 0.8, 255) 
     #Draw the text
 
